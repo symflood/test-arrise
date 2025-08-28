@@ -1,0 +1,102 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "bootstrap",
+  "projectType": "application",
+  "sourceRoot": "infra/bootstrap",
+  "targets": {
+    "initialize": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; terragrunt run --all init --working-dir \"$WDIR\" --non-interactive"
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "plan": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all plan --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all apply --non-interactive --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "validate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all validate --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "destroy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all destroy --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "terraform fmt -recursive terraform/"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "tflint --chdir terraform/"
+      }
+    },
+    "security": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "echo 'Security scan requires tfsec and checkov to be installed'"
+      }
+    },
+    "docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap",
+        "command": "terraform-docs markdown table --output-file README.md terraform/"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/bootstrap/terraform",
+        "command": "terraform init -backend=false && terraform test"
+      }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": true,
+        "commands": [
+          "nx fmt bootstrap",
+          "nx validate bootstrap",
+          "nx lint bootstrap",
+          "nx test bootstrap",
+          "nx security bootstrap"
+        ]
+      }
+    }
+  },
+  "tags": ["infra", "bootstrap", "terraform"]
+}

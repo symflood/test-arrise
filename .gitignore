@@ -1,0 +1,33 @@
+# Nx
+.nx/cache
+.nx/workspace-data
+
+# pnpm
+node_modules/
+.pnpm/
+
+# Logs
+*.log
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+terraform.tfplan
+terraform.tfplan.json
+
+# Terragrunt
+.terragrunt-cache/
+*.tfplan
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env*

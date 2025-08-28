@@ -1,0 +1,75 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "task",
+  "projectType": "application",
+  "sourceRoot": "infra/task",
+  "targets": {
+    "initialize": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; terragrunt run --all init --working-dir \"$WDIR\" --non-interactive"
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "plan": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all plan --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all apply --non-interactive --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "validate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all validate --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "destroy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "ENV=${NX_TASK_TARGET_CONFIGURATION:-dev}; [ \"$ENV\" = all ] && WDIR=\"environments\" || WDIR=\"environments/$ENV\"; TF_IN_AUTOMATION=1 terragrunt run --all destroy --working-dir \"$WDIR\""
+      },
+      "defaultConfiguration": "dev",
+      "configurations": { "dev": {}, "stage": {}, "prod": {}, "all": {} }
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "terraform fmt -recursive terraform/"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "tflint --chdir terraform/"
+      }
+    },
+    "docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "infra/task",
+        "command": "for stage in terraform/stage1 terraform/stage2 terraform/stage3; do echo \"Generating docs for $stage\"; terraform-docs markdown table --output-file README.md $stage; done"
+      }
+    }
+  },
+  "tags": ["infra", "task", "terraform"]
+}
