@@ -10,6 +10,7 @@ locals {
   environment = local.env_cfg.locals.environment
   aws_region = local.env_cfg.locals.aws_region
   account_name = local.stage_cfg.locals.account_name
+  account_id = local.stage_cfg.locals.account_id
 
   tags = {
     Project     = local.common_vars.project
@@ -23,7 +24,7 @@ remote_state {
   backend = "s3"
   config = {
     encrypt        = true
-    bucket         = "${get_aws_account_id()}-${local.common_vars.project}-${local.environment}-terraform-state"
+    bucket         = "${local.account_id}-${local.common_vars.project}-${local.environment}-terraform-state"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.aws_region
     dynamodb_table = "${local.common_vars.project}-${local.environment}-terraform-locks"
@@ -41,6 +42,11 @@ generate "provider" {
 provider "aws" {
   region  = "${local.aws_region}"
   profile = "${local.common_vars.project}.${local.environment}.${local.account_name}"
+
+  assume_role {
+    role_arn     = "arn:aws:iam::${local.account_id}:role/TerraformExecutionRole"
+    session_name = "terragrunt-${local.common_vars.project}-${local.environment}"
+  }
 }
 EOF
 }
